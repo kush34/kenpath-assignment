@@ -7,37 +7,50 @@ Sweety is a small React + Express + PostgreSQL app for recording up to four bloo
 - Node.js 20 or newer
 - PostgreSQL 14 or newer
 
-## Setup
+## Install and setup
 
-1. Create a PostgreSQL database:
+Requirements: Node.js 20+, npm, and PostgreSQL 14+.
+
+1. Create a local database:
 
    ```sh
    createdb sweety
    ```
 
-   Or create a database named `sweety` using your PostgreSQL client.
+   The PostgreSQL role used by the app needs permission to create tables and the `pgcrypto` extension. The API creates the extension and tables at startup.
 
-2. Copy the example environment file and set the connection string and a long random JWT secret:
+2. Create your local environment file:
 
    ```sh
    cp .env.example .env
    ```
 
-   Update `DATABASE_URL` if your local PostgreSQL username, password, host, or database name differs. The API creates the tables on startup. The database user needs permission to create tables and the `pgcrypto` extension.
+   Set `DATABASE_URL` to match your local PostgreSQL credentials and replace `JWT_SECRET` with a long random value (for example, `openssl rand -base64 32`). `.env` is ignored by Git; `.env.example` contains placeholders only.
 
-3. Install dependencies:
+3. Install dependencies and seed the demo accounts:
 
    ```sh
    npm install
+   npm run db:seed
    ```
 
-4. Start both apps together:
+## Run the app
 
-   ```sh
-   npm run dev
-   ```
+Start the API and frontend in separate terminals from the project root:
 
-   Or run the API and frontend in separate terminals with `npm run dev:server` and `npm run dev:client`. Open [http://localhost:5173](http://localhost:5173). The API listens on [http://localhost:4000](http://localhost:4000).
+```sh
+# Terminal 1: Express API at http://localhost:4000
+npm run dev:server
+```
+
+```sh
+# Terminal 2: Vite client at http://localhost:5173
+npm run dev:client
+```
+
+Or run both together with `npm run dev`. Open [http://localhost:5173](http://localhost:5173).
+
+The optional reminder worker requires Redis. Set `REDIS_URL`, then run `npm run worker` in another terminal. Redis caching is also optional; without `REDIS_URL`, reports are served directly from PostgreSQL.
 
 ## Demo account
 
@@ -58,7 +71,7 @@ The doctor is assigned to all five patients: Maya Patel, Arjun Rao, Priya Nair, 
 
 ## Docker Compose
 
-Copy `.env.example` to `.env`, set `JWT_SECRET`, then build and start the development app with PostgreSQL and Redis:
+Copy `.env.example` to `.env`, set a private `JWT_SECRET` and a local `POSTGRES_PASSWORD`, then build and start the development app with PostgreSQL and Redis:
 
 ```sh
 docker compose up --build
@@ -105,18 +118,36 @@ The report's `monthly` range means the entire calendar month before the selected
 npm run build
 ```
 
-Run the focused validation tests with:
+Run the API validation tests and client component tests together:
 
 ```sh
 npm test
 ```
 
-The test command runs API validation tests and React Testing Library tests for required, bounded, whole-number readings and successful form submission. They do not require a running database.
+Or run them separately:
 
-## Assumptions and notes
+```sh
+node server/validation.test.js
+npm run test:client
+```
+
+The tests cover API reading validation and the reading form; they do not require a running database.
+
+## Screenshots
+
+Doctor reports with five assigned demo patients:
+
+![Doctor dashboard](screenshots/doctor-dashboard.png)
+
+Patient glucose dashboard with seeded readings:
+
+![Patient dashboard](screenshots/patient-dashboard.png)
+
+## Notes
 
 - Calendar validation uses the API server's UTC date. This keeps API validation consistent across server deployments; a production version should use an explicit per-user timezone.
 - The demo readings are sample data for trying the report ranges, not medical guidance.
 - The UI presents readings for personal tracking and discussion with a care team; it does not interpret results or recommend treatment.
 - The frontend stores the short-lived access token in browser local storage for this assessment prototype. A production deployment should use a carefully configured secure, HTTP-only cookie and HTTPS.
 - All listed bonus tasks are implemented. For this prototype, patient-to-doctor assignments are provisioned by the seed script or database administration; there is no assignment-management screen.
+- With more time, I would add automated end-to-end coverage, timezone preferences, and a doctor-managed patient assignment flow.
