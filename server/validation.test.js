@@ -1,9 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { validateReading } from './validation.js';
+import { todayISO } from '../client/src/date.js';
 
 const valid = { date: '2026-11-18', slot: 'morning', value: 108 };
 const today = '2026-11-18';
+
+test('uses the IST calendar date across midnight', () => {
+  assert.equal(todayISO(new Date('2026-11-18T18:29:59Z')), '2026-11-18');
+  const istToday = todayISO(new Date('2026-11-18T18:30:00Z'));
+  assert.equal(istToday, '2026-11-19');
+  assert.equal(validateReading({ ...valid, date: '2026-11-19' }, istToday).errors.date, undefined);
+  assert.equal(validateReading({ ...valid, date: '2026-11-20' }, istToday).errors.date, 'Date cannot be in the future.');
+});
 
 test('accepts whole-number readings at both allowed boundaries', () => {
   for (const value of [40, 600]) {

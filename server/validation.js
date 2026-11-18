@@ -1,7 +1,9 @@
+import { todayISO } from '../client/src/date.js';
+
 const SLOT_IDS = new Set(['morning', 'breakfast', 'lunch', 'dinner']);
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-export function validateReading(input, today = new Date().toISOString().slice(0, 10)) {
+export function validateReading(input, today = todayISO()) {
   const errors = {};
   const date = input?.date;
   const slot = input?.slot;

@@ -2,11 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ReadingDialog } from './App.jsx';
-
-function todayISO() {
-  const today = new Date();
-  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-}
+import { todayISO } from './date.js';
 
 function renderForm(value = '') {
   const onSave = vi.fn();

@@ -145,7 +145,7 @@ Patient glucose dashboard with seeded readings:
 
 ## Notes
 
-- Calendar validation uses the API server's UTC date. This keeps API validation consistent across server deployments; a production version should use an explicit per-user timezone.
+- Calendar dates and the definition of today use India Standard Time (`Asia/Kolkata`) throughout the app, regardless of the user's or server's timezone. A production version should support per-user timezones.
 - The backend uses parameterized SQL through `pg` rather than an ORM. The schema and queries are small for this assessment, so direct SQL keeps database behavior explicit with fewer dependencies. If the data model grows, I would add versioned migrations and evaluate an ORM or query builder to manage relationships and schema changes.
 - Backend improvements with more time: PostgreSQL integration tests for authentication, reading ownership, doctor assignments, report ranges, and cache invalidation; schema migrations instead of applying the schema at startup; and production-grade auth protections such as login rate limiting and secure session cookies.
 - The demo readings are sample data for trying the report ranges, not medical guidance.

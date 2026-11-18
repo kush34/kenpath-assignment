@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import { initializeDatabase, pool } from './db.js';
+import { todayISO } from '../client/src/date.js';
 
 const patients = [
   { name: 'Maya Patel', email: 'demo@sweety.local', baseline: 104 },
@@ -11,9 +12,10 @@ const patients = [
 ];
 const slots = ['morning', 'breakfast', 'lunch', 'dinner'];
 
+const seedToday = todayISO();
+
 function dateDaysAgo(days) {
-  const date = new Date();
-  date.setUTCHours(12, 0, 0, 0);
+  const date = new Date(`${seedToday}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() - days);
   return date.toISOString().slice(0, 10);
 }

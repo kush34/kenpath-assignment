@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from './api.js';
 import { doctorPatientsResponseSchema, readingFormSchema, readingsResponseSchema, reportResponseSchema, validateResponse } from './schemas.js';
+import { todayISO } from './date.js';
 
 const SLOT_LIST = [
   { id: 'morning', title: 'Morning', detail: 'Fasting' },
@@ -13,10 +14,6 @@ const SLOT_COLORS = {
   breakfast: '#5476c5',
   lunch: '#c07a36',
   dinner: '#a9526b'
-};
-const todayISO = () => {
-  const date = new Date();
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
 const localDate = value => new Date(`${value}T12:00:00`);
 const displayDate = value => new Intl.DateTimeFormat('en', { month: 'long', day: 'numeric', year: 'numeric' }).format(localDate(value));

@@ -6,6 +6,7 @@ import { pool } from './db.js';
 import { createToken, requireAuth } from './auth.js';
 import { isValidEmail, validateReading } from './validation.js';
 import { getOrSetCache, invalidateReportCache } from './cache.js';
+import { todayISO } from '../client/src/date.js';
 
 const app = express();
 const route = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
@@ -210,7 +211,7 @@ app.delete('/api/readings/:id', requireAuth, route(async (req, res) => {
 }));
 
 app.get('/api/reports', requireAuth, route(async (req, res) => {
-  const date = req.query.date || new Date().toISOString().slice(0, 10);
+  const date = req.query.date || todayISO();
   const dateError = validateReading({ date, slot: 'morning', value: 40 }).errors.date;
   if (dateError) return res.status(400).json({ error: dateError });
   const range = ['daily', 'mtd', 'monthly'].includes(req.query.range) ? req.query.range : 'daily';
@@ -237,7 +238,7 @@ app.get('/api/doctor/patients/:patientId/reports', requireAuth, requireDoctor, r
     [req.userId, req.params.patientId]
   );
   if (!rows[0]) return res.status(404).json({ error: 'Patient not found or not assigned to this doctor.' });
-  const date = req.query.date || new Date().toISOString().slice(0, 10);
+  const date = req.query.date || todayISO();
   const dateError = validateReading({ date, slot: 'morning', value: 40 }).errors.date;
   if (dateError) return res.status(400).json({ error: dateError });
   const range = ['daily', 'mtd', 'monthly'].includes(req.query.range) ? req.query.range : 'daily';
