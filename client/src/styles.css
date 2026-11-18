@@ -48,24 +48,41 @@ h1 { margin: 0; font-size: 32px; font-weight: 680; letter-spacing: -.9px; line-h
 .overview-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(320px, .95fr); align-items: start; gap: 16px; }
 .card { min-width: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: 0 5px 24px rgba(29,29,31,.035); }
 .chart-card { padding: 21px 22px 14px; }
-.doctor-layout { display: grid; grid-template-columns: minmax(210px, .65fr) minmax(0, 1.8fr); align-items: start; gap: 16px; }
-.doctor-patient-card { padding: 18px 14px; }
-.doctor-patient-heading { display: flex; align-items: center; justify-content: space-between; margin: 0 4px 12px; }
-.doctor-patient-heading h2 { margin: 0; font-size: 14px; font-weight: 650; }
-.doctor-patient-heading > span { color: var(--secondary); font-size: 11px; }
-.doctor-patient-list { display: grid; gap: 4px; }
-.doctor-patient-option { display: flex; align-items: center; gap: 9px; width: 100%; padding: 9px 8px; border: 0; border-radius: 10px; color: var(--ink); background: transparent; text-align: left; font-size: 12px; }
+.doctor-topbar-inner { width: min(1680px, calc(100% - 80px)); }
+.doctor-dashboard { width: min(1680px, calc(100% - 80px)); padding-top: 42px; }
+.doctor-layout { display: grid; grid-template-columns: minmax(280px, 330px) minmax(0, 1fr); align-items: start; gap: 22px; }
+.doctor-patient-card { padding: 24px 20px; }
+.doctor-patient-heading { display: flex; align-items: center; justify-content: space-between; margin: 0 4px 18px; }
+.doctor-patient-heading h2 { margin: 0; font-size: 17px; font-weight: 650; }
+.doctor-patient-heading > span { color: var(--secondary); font-size: 13px; }
+.doctor-patient-list { display: grid; gap: 7px; }
+.doctor-patient-option { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 10px; border: 0; border-radius: 10px; color: var(--ink); background: transparent; text-align: left; font-size: 14px; }
 .doctor-patient-option[aria-pressed="true"] { background: #eef4f1; color: #286b5c; font-weight: 620; }
 .doctor-patient-option > span:nth-child(2) { flex: 1; }
 .patient-avatar { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; color: #286b5c; background: #e3eee8; font-size: 11px; font-weight: 650; }
+.doctor-patient-option .patient-avatar { width: 38px; height: 38px; font-size: 14px; }
 .doctor-empty { margin: 12px 4px 4px; color: var(--secondary); font-size: 12px; line-height: 1.5; }
-.doctor-results { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(230px, .8fr); align-items: start; gap: 16px; }
-.doctor-report-card { padding: 20px; }
-.doctor-report-card .report-title > span { color: var(--secondary); font-size: 11px; }
-.doctor-reading-card { grid-column: 1 / -1; padding: 18px 20px 6px; }
-.doctor-reading-row { display: grid; grid-template-columns: minmax(0, 1fr) 100px 110px; align-items: center; min-height: 48px; border-top: 1px solid var(--line); color: var(--secondary); font-size: 11px; }
-.doctor-reading-row strong { color: var(--ink); font-size: 12px; font-weight: 620; }
-.doctor-reading-row small { color: var(--secondary); font-size: 9px; font-weight: 450; }
+.doctor-results { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, .8fr); align-items: start; gap: 22px; }
+.doctor-report-card { padding: 26px; }
+.doctor-report-card .report-title h2 { font-size: 19px; }
+.doctor-report-card .report-title > span { color: var(--secondary); font-size: 13px; }
+.doctor-report-card .report-range { font-size: 13px; }
+.doctor-report-card .stat { min-height: 86px; padding: 15px; }
+.doctor-report-card .stat span { font-size: 12px; }
+.doctor-report-card .stat strong { font-size: 24px; }
+.doctor-report-card .stat small { font-size: 10px; }
+.doctor-report-card .reading-count { font-size: 13px; }
+.doctor-reading-card { grid-column: 1 / -1; padding: 24px 28px 10px; }
+.doctor-reading-card .log-heading h2 { font-size: 19px; }
+.doctor-reading-card .log-heading span { font-size: 13px; }
+.doctor-reading-row { display: grid; grid-template-columns: minmax(0, 1fr) 140px 150px; align-items: center; min-height: 62px; border-top: 1px solid var(--line); color: var(--secondary); font-size: 14px; }
+.doctor-reading-row strong { color: var(--ink); font-size: 16px; font-weight: 620; }
+.doctor-reading-row small { color: var(--secondary); font-size: 11px; font-weight: 450; }
+.doctor-chart-card { padding: 28px 30px 20px; }
+.doctor-chart-card .chart-title h2 { font-size: 19px; }
+.doctor-chart-card .chart-title p { font-size: 13px; }
+.doctor-chart-card .chart-legend { font-size: 12px; }
+.doctor-chart-card .daily-line-chart { aspect-ratio: 760 / 330; }
 .doctor-no-patient { padding: 25px; }
 .doctor-no-patient h2 { margin: 0; font-size: 16px; }
 .doctor-no-patient p { margin: 8px 0 0; color: var(--secondary); font-size: 12px; }

@@ -143,12 +143,12 @@ function DoctorDashboard({ session, onSignOut }) {
 
   const selectedPatient = patients.find(patient => patient.id === selectedPatientId);
   return <div className="app-shell">
-    <header className="topbar"><div className="topbar-inner">
+    <header className="topbar doctor-topbar"><div className="topbar-inner doctor-topbar-inner">
       <a className="brand" href="#patients"><span className="brand-dot" />sweety</a>
       <nav className="topnav" aria-label="Main navigation"><a href="#patients" aria-current="page">Patients</a></nav>
       <div className="user-menu"><div className="user-avatar" aria-hidden="true">{session.user.name.slice(0, 1).toUpperCase()}</div><span>{session.user.name}</span><button type="button" onClick={onSignOut}>Sign out</button></div>
     </div></header>
-    <main className="dashboard" id="patients">
+    <main className="dashboard doctor-dashboard" id="patients">
       <section className="page-heading"><div><p className="eyebrow">CARE TEAM</p><h1>Patient reports</h1><p className="page-description">Review glucose readings for patients assigned to your care.</p></div>
         <label className="date-control" htmlFor="doctor-selected-date"><span aria-hidden="true">▦</span><input id="doctor-selected-date" type="date" max={todayISO()} value={selectedDate} onChange={event => setSelectedDate(event.target.value)} /></label>
       </section>
@@ -158,7 +158,7 @@ function DoctorDashboard({ session, onSignOut }) {
           {patientsLoading ? <p className="doctor-empty">Loading patients…</p> : patients.length ? <div className="doctor-patient-list">{patients.map(patient => <button className="doctor-patient-option" type="button" key={patient.id} aria-pressed={selectedPatientId === patient.id} onClick={() => setSelectedPatientId(patient.id)}><span className="patient-avatar" aria-hidden="true">{patient.name.slice(0, 1).toUpperCase()}</span><span>{patient.name}</span><span aria-hidden="true">›</span></button>)}</div> : <p className="doctor-empty">No patients are assigned to this account.</p>}
         </aside>
         {selectedPatient ? <div className="doctor-results">
-          <article className="card chart-card"><DailyLineChart readings={report?.readings || []} isToday={selectedDate === todayISO()} selectedDate={selectedDate} range={range} rangeStart={report?.start} rangeEnd={report?.end} loading={loading} onRangeChange={setRange} /></article>
+          <article className="card chart-card doctor-chart-card"><DailyLineChart readings={report?.readings || []} isToday={selectedDate === todayISO()} selectedDate={selectedDate} range={range} rangeStart={report?.start} rangeEnd={report?.end} loading={loading} onRangeChange={setRange} /></article>
           <article className="card doctor-report-card"><div className="report-title"><h2>Glucose report</h2><span>{selectedPatient.name}</span></div>
             <p className="report-range">{report ? report.start === report.end ? displayDate(report.start) : `${displayDate(report.start)} – ${displayDate(report.end)}` : loading ? 'Loading report…' : 'No report available'}</p>
             {report?.count ? <><div className="stat-grid"><Stat label="Highest" value={report.highest} /><Stat label="Lowest" value={report.lowest} /><Stat label="Average" value={Number(report.average).toFixed(1)} /></div><div className="reading-count"><span>Readings recorded</span><strong>{report.count}</strong></div></> : !loading && <div className="empty-report"><span className="empty-mark">↗</span><strong>No readings in this period</strong></div>}
