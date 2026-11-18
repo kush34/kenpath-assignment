@@ -146,8 +146,10 @@ Patient glucose dashboard with seeded readings:
 ## Notes
 
 - Calendar validation uses the API server's UTC date. This keeps API validation consistent across server deployments; a production version should use an explicit per-user timezone.
+- The backend uses parameterized SQL through `pg` rather than an ORM. The schema and queries are small for this assessment, so direct SQL keeps database behavior explicit with fewer dependencies. If the data model grows, I would add versioned migrations and evaluate an ORM or query builder to manage relationships and schema changes.
+- Backend improvements with more time: PostgreSQL integration tests for authentication, reading ownership, doctor assignments, report ranges, and cache invalidation; schema migrations instead of applying the schema at startup; and production-grade auth protections such as login rate limiting and secure session cookies.
 - The demo readings are sample data for trying the report ranges, not medical guidance.
 - The UI presents readings for personal tracking and discussion with a care team; it does not interpret results or recommend treatment.
 - The frontend stores the short-lived access token in browser local storage for this assessment prototype. A production deployment should use a carefully configured secure, HTTP-only cookie and HTTPS.
 - All listed bonus tasks are implemented. For this prototype, patient-to-doctor assignments are provisioned by the seed script or database administration; there is no assignment-management screen.
-- With more time, I would add automated end-to-end coverage, timezone preferences, and a doctor-managed patient assignment flow.
+- Other improvements with more time: automated end-to-end coverage, timezone preferences, and a doctor-managed patient assignment flow.
