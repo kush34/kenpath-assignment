@@ -43,5 +43,19 @@ services:
       cache:
         condition: service_healthy
 
+  worker:
+    build: .
+    command: ["npm", "run", "worker"]
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-sweety}
+      REDIS_URL: ${REDIS_URL:-redis://cache:6379}
+      REMINDER_TIMEZONE: ${REMINDER_TIMEZONE:-Asia/Kolkata}
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+
 volumes:
   sweety_data:

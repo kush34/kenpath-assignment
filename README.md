@@ -60,7 +60,7 @@ Copy `.env.example` to `.env`, set `JWT_SECRET`, then build and start the app wi
 docker compose up --build
 ```
 
-Open [http://localhost:4000](http://localhost:4000). Compose keeps PostgreSQL data in the `sweety_data` volume. Report results are cached for one minute and invalidated when a reading is created, edited, or deleted. Stop the services with `docker compose down`; use `docker compose down -v` only when you also want to delete the database volume.
+Open [http://localhost:4000](http://localhost:4000). Compose keeps PostgreSQL data in the `sweety_data` volume. Report results are cached for one minute and invalidated when a reading is created, edited, or deleted. A worker logs accounts below four daily readings at 09:00 in `REMINDER_TIMEZONE`. Stop the services with `docker compose down`; use `docker compose down -v` only when you also want to delete the database volume.
 
 ## Features
 
@@ -72,6 +72,7 @@ Open [http://localhost:4000](http://localhost:4000). Compose keeps PostgreSQL da
 - Browse readings with server-side pagination and filter them to one date when needed.
 - Explore daily and monthly readings in a slot-colored line chart.
 - Cache report responses in Redis and clear a user's cached ranges when their readings change.
+- Run a BullMQ daily job that logs accounts with fewer than four readings; it does not send messages.
 - Show a friendly empty state when a report has no readings.
 
 ## API overview
@@ -111,4 +112,4 @@ The test command runs API validation tests and React Testing Library tests for r
 - The demo readings are sample data for trying the report ranges, not medical guidance.
 - The UI presents readings for personal tracking and discussion with a care team; it does not interpret results or recommend treatment.
 - The frontend stores the short-lived access token in browser local storage for this assessment prototype. A production deployment should use a carefully configured secure, HTTP-only cookie and HTTPS.
-- Pagination and charting bonuses are included. Other optional tasks are still open for implementation.
+- Pagination, charting, Docker Compose, form tests, Redis caching, and the BullMQ reminder bonus are included. The doctor role remains open.
