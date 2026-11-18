@@ -102,7 +102,7 @@ Run the focused validation tests with:
 npm test
 ```
 
-These tests cover reading value, date, and time-slot validation without requiring a running database.
+The test command runs API validation tests and React Testing Library tests for required, bounded, whole-number readings and successful form submission. They do not require a running database.
 
 ## Assumptions and notes
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from './api.js';
-import { readingsResponseSchema, reportResponseSchema, validateResponse } from './schemas.js';
+import { readingFormSchema, readingsResponseSchema, reportResponseSchema, validateResponse } from './schemas.js';
 
 const SLOT_LIST = [
   { id: 'morning', title: 'Morning', detail: 'Fasting' },
@@ -276,7 +276,7 @@ function ReadingRow({ slot, reading, onEdit, onDelete }) {
   </div>;
 }
 
-function ReadingDialog({ initial, token, onClose, onSave }) {
+export function ReadingDialog({ initial, token, onClose, onSave }) {
   const [form, setForm] = useState({ date: initial.date, slot: initial.slot || 'morning', value: initial.value ?? '' });
   const [errors, setErrors] = useState({});
   const [error, setError] = useState('');
@@ -284,8 +284,14 @@ function ReadingDialog({ initial, token, onClose, onSave }) {
   const isEdit = Boolean(initial.id);
   function set(key, value) { setForm(previous => ({ ...previous, [key]: value })); setErrors(previous => ({ ...previous, [key]: '' })); }
   async function submit(event) {
-    event.preventDefault(); setError(''); setErrors({}); setSaving(true);
-    try { await onSave({ date: form.date, slot: form.slot, value: form.value === '' ? '' : Number(form.value) }); }
+    event.preventDefault(); setError(''); setErrors({});
+    const validation = readingFormSchema.safeParse(form);
+    if (!validation.success) {
+      setErrors(Object.fromEntries(validation.error.issues.map(issue => [issue.path[0], issue.message])));
+      return;
+    }
+    setSaving(true);
+    try { await onSave(validation.data); }
     catch (saveError) { setError(saveError.message); setErrors(saveError.fields || {}); }
     finally { setSaving(false); }
   }
