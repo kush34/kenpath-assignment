@@ -29,11 +29,23 @@ try {
   const { rows } = await pool.query(
     `INSERT INTO users (name, email, password_hash)
      VALUES ('Demo User', 'demo@sweety.local', $1)
-     ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, password_hash = EXCLUDED.password_hash
+     ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, password_hash = EXCLUDED.password_hash, role = 'patient'
      RETURNING id`,
     [passwordHash]
   );
   const userId = rows[0].id;
+  const doctorPasswordHash = await bcrypt.hash('SweetyDoctor123!', 12);
+  const { rows: doctorRows } = await pool.query(
+    `INSERT INTO users (name, email, password_hash, role)
+     VALUES ('Demo Doctor', 'doctor@sweety.local', $1, 'doctor')
+     ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, password_hash = EXCLUDED.password_hash, role = 'doctor'
+     RETURNING id`,
+    [doctorPasswordHash]
+  );
+  await pool.query(
+    'INSERT INTO doctor_patient_assignments (doctor_id, patient_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+    [doctorRows[0].id, userId]
+  );
   await pool.query('DELETE FROM readings WHERE user_id = $1', [userId]);
   const samples = [
     [daysAgo(0), 'morning', 108], [daysAgo(0), 'breakfast', 134],
@@ -45,7 +57,7 @@ try {
   for (const [date, slot, value] of samples) {
     await pool.query('INSERT INTO readings (user_id, reading_date, slot, value) VALUES ($1, $2::date, $3, $4)', [userId, date, slot, value]);
   }
-  console.log('Seeded the demo account: demo@sweety.local / SweetyDemo123!');
+  console.log('Seeded patient demo@sweety.local / SweetyDemo123! and doctor doctor@sweety.local / SweetyDoctor123!.');
 } catch (error) {
   console.error('Could not seed the database:', error.message);
   process.exitCode = 1;

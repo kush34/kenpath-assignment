@@ -9,8 +9,42 @@ import { getOrSetCache, invalidateReportCache } from './cache.js';
 
 const app = express();
 const route = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
+const requireDoctor = route(async (req, res, next) => {
+  const { rows } = await pool.query('SELECT role FROM users WHERE id = $1', [req.userId]);
+  if (rows[0]?.role !== 'doctor') return res.status(403).json({ error: 'Doctor access is required.' });
+  return next();
+});
 const slotOrder = "CASE slot WHEN 'morning' THEN 1 WHEN 'breakfast' THEN 2 WHEN 'lunch' THEN 3 ELSE 4 END";
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function reportRange(range, date) {
+  const selected = new Date(`${date}T00:00:00Z`);
+  let start = date, end = date;
+  if (range === 'mtd') start = `${date.slice(0, 7)}-01`;
+  if (range === 'monthly') {
+    const firstOfSelectedMonth = new Date(Date.UTC(selected.getUTCFullYear(), selected.getUTCMonth(), 1));
+    end = new Date(firstOfSelectedMonth.getTime() - 86400000).toISOString().slice(0, 10);
+    start = `${end.slice(0, 7)}-01`;
+  }
+  return { start, end };
+}
+
+async function buildReport(userId, range, date) {
+  const { start, end } = reportRange(range, date);
+  const { rows } = await pool.query(
+    `SELECT id, reading_date::text AS date, slot, value FROM readings WHERE user_id = $1 AND reading_date BETWEEN $2::date AND $3::date ORDER BY reading_date, ${slotOrder}`,
+    [userId, start, end]
+  );
+  const values = rows.map(row => Number(row.value));
+  const count = values.length;
+  return {
+    range, start, end, count,
+    highest: count ? Math.max(...values) : null,
+    lowest: count ? Math.min(...values) : null,
+    average: count ? Number((values.reduce((sum, value) => sum + value, 0) / count).toFixed(1)) : null,
+    readings: rows
+  };
+}
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN?.split(',').map(value => value.trim()) || 'http://localhost:5173' }));
 app.use(express.json({ limit: '32kb' }));
@@ -32,7 +66,7 @@ app.post('/api/auth/signup', route(async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 12);
   try {
     const { rows } = await pool.query(
-      'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email',
+      'INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email, role',
       [name, email, passwordHash]
     );
     const user = rows[0];
@@ -49,16 +83,16 @@ app.post('/api/auth/login', route(async (req, res) => {
   if (!isValidEmail(email) || typeof password !== 'string' || !password) {
     return res.status(400).json({ error: 'Enter your email and password.' });
   }
-  const { rows } = await pool.query('SELECT id, name, email, password_hash FROM users WHERE email = $1', [email]);
+  const { rows } = await pool.query('SELECT id, name, email, role, password_hash FROM users WHERE email = $1', [email]);
   const user = rows[0];
   if (!user || !(await bcrypt.compare(password, user.password_hash))) {
     return res.status(401).json({ error: 'Email or password is incorrect.' });
   }
-  return res.json({ token: createToken(user.id), user: { id: user.id, name: user.name, email: user.email } });
+  return res.json({ token: createToken(user.id), user: { id: user.id, name: user.name, email: user.email, role: user.role } });
 }));
 
 app.get('/api/auth/me', requireAuth, route(async (req, res) => {
-  const { rows } = await pool.query('SELECT id, name, email FROM users WHERE id = $1', [req.userId]);
+  const { rows } = await pool.query('SELECT id, name, email, role FROM users WHERE id = $1', [req.userId]);
   if (!rows[0]) return res.status(401).json({ error: 'Account not found. Please log in again.' });
   return res.json({ user: rows[0] });
 }));
@@ -180,29 +214,34 @@ app.get('/api/reports', requireAuth, route(async (req, res) => {
   const dateError = validateReading({ date, slot: 'morning', value: 40 }).errors.date;
   if (dateError) return res.status(400).json({ error: dateError });
   const range = ['daily', 'mtd', 'monthly'].includes(req.query.range) ? req.query.range : 'daily';
-  const selected = new Date(`${date}T00:00:00Z`);
-  let start = date, end = date;
-  if (range === 'mtd') start = `${date.slice(0, 7)}-01`;
-  if (range === 'monthly') {
-    const firstOfSelectedMonth = new Date(Date.UTC(selected.getUTCFullYear(), selected.getUTCMonth(), 1));
-    end = new Date(firstOfSelectedMonth.getTime() - 86400000).toISOString().slice(0, 10);
-    start = `${end.slice(0, 7)}-01`;
-  }
-  const result = await getOrSetCache(`sweety:report:${req.userId}:${range}:${date}`, async () => {
-    const { rows } = await pool.query(
-      `SELECT id, reading_date::text AS date, slot, value FROM readings WHERE user_id = $1 AND reading_date BETWEEN $2::date AND $3::date ORDER BY reading_date, ${slotOrder}`,
-      [req.userId, start, end]
-    );
-    const values = rows.map(row => Number(row.value));
-    const count = values.length;
-    return {
-      range, start, end, count,
-      highest: count ? Math.max(...values) : null,
-      lowest: count ? Math.min(...values) : null,
-      average: count ? Number((values.reduce((sum, value) => sum + value, 0) / count).toFixed(1)) : null,
-      readings: rows
-    };
-  });
+  const result = await getOrSetCache(`sweety:report:${req.userId}:${range}:${date}`, () => buildReport(req.userId, range, date));
+  return res.json(result);
+}));
+
+app.get('/api/doctor/patients', requireAuth, requireDoctor, route(async (req, res) => {
+  const { rows } = await pool.query(
+    `SELECT users.id, users.name FROM doctor_patient_assignments
+     JOIN users ON users.id = doctor_patient_assignments.patient_id AND users.role = 'patient'
+     WHERE doctor_patient_assignments.doctor_id = $1 ORDER BY users.name`,
+    [req.userId]
+  );
+  return res.json({ patients: rows });
+}));
+
+app.get('/api/doctor/patients/:patientId/reports', requireAuth, requireDoctor, route(async (req, res) => {
+  if (!UUID_PATTERN.test(req.params.patientId)) return res.status(400).json({ error: 'Please enter a valid patient ID.' });
+  const { rows } = await pool.query(
+    `SELECT users.id FROM doctor_patient_assignments
+     JOIN users ON users.id = doctor_patient_assignments.patient_id AND users.role = 'patient'
+     WHERE doctor_patient_assignments.doctor_id = $1 AND doctor_patient_assignments.patient_id = $2`,
+    [req.userId, req.params.patientId]
+  );
+  if (!rows[0]) return res.status(404).json({ error: 'Patient not found or not assigned to this doctor.' });
+  const date = req.query.date || new Date().toISOString().slice(0, 10);
+  const dateError = validateReading({ date, slot: 'morning', value: 40 }).errors.date;
+  if (dateError) return res.status(400).json({ error: dateError });
+  const range = ['daily', 'mtd', 'monthly'].includes(req.query.range) ? req.query.range : 'daily';
+  const result = await getOrSetCache(`sweety:doctor-report:${req.userId}:${req.params.patientId}:${range}:${date}`, () => buildReport(req.params.patientId, range, date));
   return res.json(result);
 }));
 

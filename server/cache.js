@@ -38,12 +38,14 @@ export async function getOrSetCache(key, load, ttlSeconds = 60) {
 export async function invalidateReportCache(userId) {
   if (!client?.isReady) return;
   try {
-    let cursor = '0';
-    do {
-      const result = await client.scan(cursor, { MATCH: `sweety:report:${userId}:*`, COUNT: 100 });
-      cursor = result.cursor;
-      if (result.keys.length) await client.del(result.keys);
-    } while (cursor !== '0');
+    for (const pattern of [`sweety:report:${userId}:*`, `sweety:doctor-report:*:${userId}:*`]) {
+      let cursor = '0';
+      do {
+        const result = await client.scan(cursor, { MATCH: pattern, COUNT: 100 });
+        cursor = result.cursor;
+        if (result.keys.length) await client.del(result.keys);
+      } while (cursor !== '0');
+    }
   } catch (error) {
     console.warn('Could not invalidate report cache:', error.message);
   }

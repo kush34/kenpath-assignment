@@ -38,6 +38,10 @@ export const readingsResponseSchema = z.object({
   })
 });
 
+export const doctorPatientsResponseSchema = z.object({
+  patients: z.array(z.object({ id: z.string().uuid(), name: z.string().min(1) }))
+});
+
 export const reportResponseSchema = z.object({
   range: z.enum(['daily', 'mtd', 'monthly']),
   start: dateSchema,

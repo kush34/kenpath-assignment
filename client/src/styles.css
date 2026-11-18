@@ -48,6 +48,27 @@ h1 { margin: 0; font-size: 32px; font-weight: 680; letter-spacing: -.9px; line-h
 .overview-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(320px, .95fr); align-items: start; gap: 16px; }
 .card { min-width: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: 0 5px 24px rgba(29,29,31,.035); }
 .chart-card { padding: 21px 22px 14px; }
+.doctor-layout { display: grid; grid-template-columns: minmax(210px, .65fr) minmax(0, 1.8fr); align-items: start; gap: 16px; }
+.doctor-patient-card { padding: 18px 14px; }
+.doctor-patient-heading { display: flex; align-items: center; justify-content: space-between; margin: 0 4px 12px; }
+.doctor-patient-heading h2 { margin: 0; font-size: 14px; font-weight: 650; }
+.doctor-patient-heading > span { color: var(--secondary); font-size: 11px; }
+.doctor-patient-list { display: grid; gap: 4px; }
+.doctor-patient-option { display: flex; align-items: center; gap: 9px; width: 100%; padding: 9px 8px; border: 0; border-radius: 10px; color: var(--ink); background: transparent; text-align: left; font-size: 12px; }
+.doctor-patient-option[aria-pressed="true"] { background: #eef4f1; color: #286b5c; font-weight: 620; }
+.doctor-patient-option > span:nth-child(2) { flex: 1; }
+.patient-avatar { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; color: #286b5c; background: #e3eee8; font-size: 11px; font-weight: 650; }
+.doctor-empty { margin: 12px 4px 4px; color: var(--secondary); font-size: 12px; line-height: 1.5; }
+.doctor-results { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(230px, .8fr); align-items: start; gap: 16px; }
+.doctor-report-card { padding: 20px; }
+.doctor-report-card .report-title > span { color: var(--secondary); font-size: 11px; }
+.doctor-reading-card { grid-column: 1 / -1; padding: 18px 20px 6px; }
+.doctor-reading-row { display: grid; grid-template-columns: minmax(0, 1fr) 100px 110px; align-items: center; min-height: 48px; border-top: 1px solid var(--line); color: var(--secondary); font-size: 11px; }
+.doctor-reading-row strong { color: var(--ink); font-size: 12px; font-weight: 620; }
+.doctor-reading-row small { color: var(--secondary); font-size: 9px; font-weight: 450; }
+.doctor-no-patient { padding: 25px; }
+.doctor-no-patient h2 { margin: 0; font-size: 16px; }
+.doctor-no-patient p { margin: 8px 0 0; color: var(--secondary); font-size: 12px; }
 .chart-topline { display: flex; align-items: center; gap: 12px; }
 .chart-title { min-width: 145px; flex-shrink: 0; }
 .chart-title h2, .report-title h2, .log-heading h2 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -.2px; }
@@ -146,6 +167,8 @@ h1 { margin: 0; font-size: 32px; font-weight: 680; letter-spacing: -.9px; line-h
 
 @media (max-width: 850px) {
   .overview-grid { grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); }
+  .doctor-layout { grid-template-columns: minmax(190px, .6fr) minmax(0, 1.8fr); gap: 12px; }
+  .doctor-results { grid-template-columns: 1fr; gap: 12px; }
   .dashboard { padding-top: 29px; }
 }
 @media (max-width: 680px) {
@@ -162,6 +185,10 @@ h1 { margin: 0; font-size: 32px; font-weight: 680; letter-spacing: -.9px; line-h
   .date-control { flex: 1; }
   .date-control input { width: 100%; }
   .overview-grid { grid-template-columns: 1fr; gap: 12px; }
+  .doctor-layout { grid-template-columns: 1fr; }
+  .doctor-results { grid-template-columns: 1fr; }
+  .doctor-patient-card { padding: 15px 12px; }
+  .doctor-reading-card { padding-inline: 15px; }
   .chart-card { padding: 18px 16px 13px; }
   .chart-topline { flex-wrap: wrap; }
   .chart-range-tabs { width: 100%; margin-left: 0; }

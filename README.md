@@ -49,8 +49,10 @@ npm run db:seed
 
 - Email: `demo@sweety.local`
 - Password: `SweetyDemo123!`
+- Doctor email: `doctor@sweety.local`
+- Doctor password: `SweetyDoctor123!`
 
-Running the seed command resets the demo user's readings to its sample data. It does not modify other users.
+The seeded doctor is assigned to the demo patient. Running the seed command resets the demo user's readings to its sample data; it does not modify other patients.
 
 ## Docker Compose
 
@@ -73,6 +75,7 @@ Open [http://localhost:4000](http://localhost:4000). Compose keeps PostgreSQL da
 - Explore daily and monthly readings in a slot-colored line chart.
 - Cache report responses in Redis and clear a user's cached ranges when their readings change.
 - Run a BullMQ daily job that logs accounts with fewer than four readings; it does not send messages.
+- Give doctors read-only access to reports for patients assigned to them.
 - Show a friendly empty state when a report has no readings.
 
 ## API overview
@@ -89,6 +92,8 @@ All reading and report endpoints require `Authorization: Bearer <token>`.
 | PUT | `/api/readings/:id` | Edit a reading |
 | DELETE | `/api/readings/:id` | Delete a reading |
 | GET | `/api/reports?range=daily&date=YYYY-MM-DD` | Get a daily, `mtd`, or `monthly` report |
+| GET | `/api/doctor/patients` | List patients assigned to the signed-in doctor |
+| GET | `/api/doctor/patients/:patientId/reports?range=daily&date=YYYY-MM-DD` | View a report for an assigned patient |
 
 The report's `monthly` range means the entire calendar month before the selected date's month. The `mtd` range ends on the selected date.
 
@@ -112,4 +117,4 @@ The test command runs API validation tests and React Testing Library tests for r
 - The demo readings are sample data for trying the report ranges, not medical guidance.
 - The UI presents readings for personal tracking and discussion with a care team; it does not interpret results or recommend treatment.
 - The frontend stores the short-lived access token in browser local storage for this assessment prototype. A production deployment should use a carefully configured secure, HTTP-only cookie and HTTPS.
-- Pagination, charting, Docker Compose, form tests, Redis caching, and the BullMQ reminder bonus are included. The doctor role remains open.
+- All listed bonus tasks are implemented. For this prototype, patient-to-doctor assignments are provisioned by the seed script or database administration; there is no assignment-management screen.

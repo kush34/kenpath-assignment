@@ -3,8 +3,25 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'patient',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'patient';
+DO $$ BEGIN
+  ALTER TABLE users ADD CONSTRAINT users_role_check CHECK (role IN ('patient', 'doctor'));
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+CREATE TABLE IF NOT EXISTS doctor_patient_assignments (
+  doctor_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  patient_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (doctor_id, patient_id),
+  CONSTRAINT doctor_cannot_be_patient CHECK (doctor_id <> patient_id)
+);
+
+CREATE INDEX IF NOT EXISTS doctor_assignments_patient_idx ON doctor_patient_assignments (patient_id);
 
 CREATE TABLE IF NOT EXISTS readings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
