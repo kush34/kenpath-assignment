@@ -41,7 +41,7 @@ Sweety is a small React + Express + PostgreSQL app for recording up to four bloo
 
 ## Demo account
 
-To add a demo user and sample readings:
+To seed the demo doctor and five sample patient accounts:
 
 ```sh
 npm run db:seed
@@ -49,10 +49,12 @@ npm run db:seed
 
 - Email: `demo@sweety.local`
 - Password: `SweetyDemo123!`
+- Other patient emails: `arjun.rao@sweety.local`, `priya.nair@sweety.local`, `daniel.kim@sweety.local`, `aisha.khan@sweety.local`
+- All patient accounts use password: `SweetyDemo123!`
 - Doctor email: `doctor@sweety.local`
 - Doctor password: `SweetyDoctor123!`
 
-The seeded doctor is assigned to the demo patient. Running the seed command resets the demo user's readings to its sample data; it does not modify other patients.
+The doctor is assigned to all five patients: Maya Patel, Arjun Rao, Priya Nair, Daniel Kim, and Aisha Khan. Each account receives 60 days of synthetic readings across four daily time slots. Re-running the seed replaces readings only for these five sample accounts and preserves readings for other patients.
 
 ## Docker Compose
 
