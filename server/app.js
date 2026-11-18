@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
+import { fileURLToPath } from 'node:url';
 import { pool } from './db.js';
 import { createToken, requireAuth } from './auth.js';
 import { isValidEmail, validateReading } from './validation.js';
@@ -197,6 +198,8 @@ app.get('/api/reports', requireAuth, route(async (req, res) => {
     readings: range === 'daily' ? rows : []
   });
 }));
+
+app.use(express.static(fileURLToPath(new URL('../client/dist/', import.meta.url))));
 
 function slotTitle(slot) {
   return ({ morning: 'Morning', breakfast: 'After breakfast', lunch: 'After lunch', dinner: 'After dinner' })[slot] || slot;

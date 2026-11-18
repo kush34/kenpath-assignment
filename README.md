@@ -52,6 +52,16 @@ npm run db:seed
 
 Running the seed command resets the demo user's readings to its sample data. It does not modify other users.
 
+## Docker Compose
+
+Copy `.env.example` to `.env`, set `JWT_SECRET`, then build and start the app with PostgreSQL:
+
+```sh
+docker compose up --build
+```
+
+Open [http://localhost:4000](http://localhost:4000). Compose keeps PostgreSQL data in the `sweety_data` volume. Stop the services with `docker compose down`; use `docker compose down -v` only when you also want to delete the database volume.
+
 ## Features
 
 - Register with name, email, and password; passwords are hashed with bcrypt before storage.
