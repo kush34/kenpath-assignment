@@ -48,6 +48,33 @@ h1 { margin: 0; font-size: 32px; font-weight: 680; letter-spacing: -.9px; line-h
 .overview-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(320px, .95fr); align-items: start; gap: 16px; }
 .card { min-width: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: 0 5px 24px rgba(29,29,31,.035); }
 .chart-card { padding: 21px 22px 14px; }
+.patient-topbar-inner { width: min(1680px, calc(100% - 80px)); }
+.patient-dashboard { width: min(1680px, calc(100% - 80px)); padding-top: 42px; }
+.patient-overview-grid { grid-template-columns: minmax(0, 1.6fr) minmax(360px, .9fr); gap: 22px; }
+.patient-chart-card { padding: 28px 30px 20px; }
+.patient-chart-card .chart-title h2, .patient-report-card .report-title h2, .patient-log-card .log-heading h2 { font-size: 19px; }
+.patient-chart-card .chart-title p { font-size: 13px; }
+.patient-chart-card .chart-legend { font-size: 12px; }
+.patient-chart-card .daily-line-chart { aspect-ratio: 760 / 330; }
+.patient-report-card { padding: 26px; }
+.patient-report-card .range-tabs button { min-height: 38px; font-size: 12px; }
+.patient-report-card .report-range { font-size: 13px; }
+.patient-report-card .stat { min-height: 86px; padding: 15px; }
+.patient-report-card .stat span { font-size: 12px; }
+.patient-report-card .stat strong { font-size: 24px; }
+.patient-report-card .stat small { font-size: 10px; }
+.patient-report-card .reading-count { font-size: 13px; }
+.patient-log-card { padding: 24px 28px 10px; }
+.patient-log-card .log-heading h2 { font-size: 19px; }
+.patient-log-card .log-heading span { font-size: 13px; }
+.patient-log-card .reading-row { min-height: 76px; }
+.patient-log-card .slot-badge { width: 38px; height: 38px; }
+.patient-log-card .slot-name-wrap strong { font-size: 14px; }
+.patient-log-card .slot-name-wrap small { font-size: 11px; }
+.patient-log-card .row-value { font-size: 16px; }
+.patient-log-card .row-value small { font-size: 11px; }
+.patient-log-card .row-status { font-size: 13px; }
+.patient-log-card .icon-button { width: 36px; height: 36px; }
 .doctor-topbar-inner { width: min(1680px, calc(100% - 80px)); }
 .doctor-dashboard { width: min(1680px, calc(100% - 80px)); padding-top: 42px; }
 .doctor-layout { display: grid; grid-template-columns: minmax(280px, 330px) minmax(0, 1fr); align-items: start; gap: 22px; }
