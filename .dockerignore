@@ -3,4 +3,7 @@ client/dist
 dist
 .git
 .env
+.aws
+.codex
+.agents
 npm-debug.log*
