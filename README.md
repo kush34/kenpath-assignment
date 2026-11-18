@@ -56,13 +56,13 @@ The seeded doctor is assigned to the demo patient. Running the seed command rese
 
 ## Docker Compose
 
-Copy `.env.example` to `.env`, set `JWT_SECRET`, then build and start the app with PostgreSQL and Redis:
+Copy `.env.example` to `.env`, set `JWT_SECRET`, then build and start the development app with PostgreSQL and Redis:
 
 ```sh
 docker compose up --build
 ```
 
-Open [http://localhost:4000](http://localhost:4000). Compose keeps PostgreSQL data in the `sweety_data` volume. Report results are cached for one minute and invalidated when a reading is created, edited, or deleted. A worker logs accounts below four daily readings at 09:00 in `REMINDER_TIMEZONE`. Stop the services with `docker compose down`; use `docker compose down -v` only when you also want to delete the database volume.
+Open [http://localhost:5173](http://localhost:5173). Compose keeps PostgreSQL data in the `sweety_data` volume. Report results are cached for one minute and invalidated when a reading is created, edited, or deleted. A worker logs accounts below four daily readings at 09:00 in `REMINDER_TIMEZONE`. Stop the services with `docker compose down`; use `docker compose down -v` only when you also want to delete the database volume.
 
 ## Features
 
