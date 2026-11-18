@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { pool } from './db.js';
 import { createToken, requireAuth } from './auth.js';
 import { isValidEmail, validateReading } from './validation.js';
+import { getOrSetCache, invalidateReportCache } from './cache.js';
 
 const app = express();
 const route = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
@@ -109,6 +110,7 @@ app.post('/api/readings', requireAuth, route(async (req, res) => {
       [req.userId, checked.date, checked.slot, checked.value]
     );
     await client.query('COMMIT');
+    await invalidateReportCache(req.userId);
     return res.status(201).json({ reading: rows[0] });
   } catch (error) {
     await client.query('ROLLBACK');
@@ -154,6 +156,7 @@ app.put('/api/readings/:id', requireAuth, route(async (req, res) => {
       [checked.date, checked.slot, checked.value, req.params.id, req.userId]
     );
     await client.query('COMMIT');
+    await invalidateReportCache(req.userId);
     return res.json({ reading: rows[0] });
   } catch (error) {
     await client.query('ROLLBACK');
@@ -168,6 +171,7 @@ app.delete('/api/readings/:id', requireAuth, route(async (req, res) => {
   if (!UUID_PATTERN.test(req.params.id)) return res.status(400).json({ error: 'Please enter a valid reading ID.' });
   const { rowCount } = await pool.query('DELETE FROM readings WHERE id = $1 AND user_id = $2', [req.params.id, req.userId]);
   if (!rowCount) return res.status(404).json({ error: 'Reading not found.' });
+  await invalidateReportCache(req.userId);
   return res.status(204).end();
 }));
 
@@ -184,19 +188,22 @@ app.get('/api/reports', requireAuth, route(async (req, res) => {
     end = new Date(firstOfSelectedMonth.getTime() - 86400000).toISOString().slice(0, 10);
     start = `${end.slice(0, 7)}-01`;
   }
-  const { rows } = await pool.query(
-    `SELECT id, reading_date::text AS date, slot, value FROM readings WHERE user_id = $1 AND reading_date BETWEEN $2::date AND $3::date ORDER BY reading_date, ${slotOrder}`,
-    [req.userId, start, end]
-  );
-  const values = rows.map(row => Number(row.value));
-  const count = values.length;
-  return res.json({
-    range, start, end, count,
-    highest: count ? Math.max(...values) : null,
-    lowest: count ? Math.min(...values) : null,
-    average: count ? Number((values.reduce((sum, value) => sum + value, 0) / count).toFixed(1)) : null,
-    readings: range === 'daily' ? rows : []
+  const result = await getOrSetCache(`sweety:report:${req.userId}:${range}:${date}`, async () => {
+    const { rows } = await pool.query(
+      `SELECT id, reading_date::text AS date, slot, value FROM readings WHERE user_id = $1 AND reading_date BETWEEN $2::date AND $3::date ORDER BY reading_date, ${slotOrder}`,
+      [req.userId, start, end]
+    );
+    const values = rows.map(row => Number(row.value));
+    const count = values.length;
+    return {
+      range, start, end, count,
+      highest: count ? Math.max(...values) : null,
+      lowest: count ? Math.min(...values) : null,
+      average: count ? Number((values.reduce((sum, value) => sum + value, 0) / count).toFixed(1)) : null,
+      readings: rows
+    };
   });
+  return res.json(result);
 }));
 
 app.use(express.static(fileURLToPath(new URL('../client/dist/', import.meta.url))));
