@@ -59,6 +59,8 @@ Running the seed command resets the demo user's readings to its sample data. It 
 - Add, view, edit, and delete dated readings for Morning (fasting), After breakfast, After lunch, and After dinner.
 - Validate required values, whole-number range (40–600 mg/dL), one reading per slot/day, four readings/day, and no future dates.
 - View highest, lowest, average (one decimal), and reading count for a selected day, month to date, or the whole previous month.
+- Browse readings with server-side pagination and filter them to one date when needed.
+- Explore daily and monthly readings in a slot-colored line chart.
 - Show a friendly empty state when a report has no readings.
 
 ## API overview
@@ -70,7 +72,7 @@ All reading and report endpoints require `Authorization: Bearer <token>`.
 | POST | `/api/auth/signup` | Create an account |
 | POST | `/api/auth/login` | Sign in |
 | GET | `/api/auth/me` | Get the signed-in user |
-| GET | `/api/readings?date=YYYY-MM-DD` | List the user's readings, optionally for a date |
+| GET | `/api/readings?page=1&limit=20&date=YYYY-MM-DD` | List a page of the user's readings; date is optional |
 | POST | `/api/readings` | Add a reading |
 | PUT | `/api/readings/:id` | Edit a reading |
 | DELETE | `/api/readings/:id` | Delete a reading |
@@ -98,4 +100,4 @@ These tests cover reading value, date, and time-slot validation without requirin
 - The demo readings are sample data for trying the report ranges, not medical guidance.
 - The UI presents readings for personal tracking and discussion with a care team; it does not interpret results or recommend treatment.
 - The frontend stores the short-lived access token in browser local storage for this assessment prototype. A production deployment should use a carefully configured secure, HTTP-only cookie and HTTPS.
-- The implementation includes only the assignment's required features. Optional bonus tasks are not included.
+- Pagination and charting bonuses are included. Other optional tasks are still open for implementation.

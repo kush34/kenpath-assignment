@@ -12,7 +12,15 @@ const readingSchema = z.object({
   value: z.preprocess(value => typeof value === 'string' ? Number(value) : value, z.number().int().min(40).max(600))
 });
 
-export const readingsResponseSchema = z.object({ readings: z.array(readingSchema) });
+export const readingsResponseSchema = z.object({
+  readings: z.array(readingSchema),
+  pagination: z.object({
+    page: z.number().int().positive(),
+    limit: z.number().int().positive().max(100),
+    total: z.number().int().nonnegative(),
+    totalPages: z.number().int().nonnegative()
+  })
+});
 
 export const reportResponseSchema = z.object({
   range: z.enum(['daily', 'mtd', 'monthly']),

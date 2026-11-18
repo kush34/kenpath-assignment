@@ -66,13 +66,22 @@ app.get('/api/readings', requireAuth, route(async (req, res) => {
   if (date !== undefined && validateReading({ date, slot: 'morning', value: 40 }).errors.date) {
     return res.status(400).json({ error: 'Please enter a valid date.' });
   }
+  const page = req.query.page === undefined ? 1 : Number(req.query.page);
+  const limit = req.query.limit === undefined ? 20 : Number(req.query.limit);
+  if (!Number.isSafeInteger(page) || page < 1 || !Number.isSafeInteger(limit) || limit < 1 || limit > 100) {
+    return res.status(400).json({ error: 'Page must be positive and limit must be between 1 and 100.' });
+  }
   const params = [req.userId];
   const dateFilter = date ? (params.push(date), ` AND reading_date = $${params.length}::date`) : '';
-  const { rows } = await pool.query(
-    `SELECT id, reading_date::text AS date, slot, value, created_at, updated_at FROM readings WHERE user_id = $1${dateFilter} ORDER BY reading_date DESC, ${slotOrder}`,
-    params
-  );
-  return res.json({ readings: rows });
+  const [{ rows }, { rows: countRows }] = await Promise.all([
+    pool.query(
+      `SELECT id, reading_date::text AS date, slot, value, created_at, updated_at FROM readings WHERE user_id = $1${dateFilter} ORDER BY reading_date DESC, ${slotOrder} LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+      [...params, limit, (page - 1) * limit]
+    ),
+    pool.query(`SELECT COUNT(*)::int AS total FROM readings WHERE user_id = $1${dateFilter}`, params)
+  ]);
+  const total = countRows[0].total;
+  return res.json({ readings: rows, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } });
 }));
 
 app.post('/api/readings', requireAuth, route(async (req, res) => {
