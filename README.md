@@ -77,7 +77,11 @@ Copy `.env.example` to `.env`, set a private `JWT_SECRET` and a local `POSTGRES_
 docker compose up --build
 ```
 
-Open [http://localhost:5173](http://localhost:5173). Compose keeps PostgreSQL data in the `sweety_data` volume. Report results are cached for one minute and invalidated when a reading is created, edited, or deleted. At 22:00 in `REMINDER_TIMEZONE` (Asia/Kolkata by default), a worker logs accounts with fewer than four readings for that day, allowing time for the after-dinner reading. Stop the services with `docker compose down`; use `docker compose down -v` only when you also want to delete the database volume.
+Compose exposes the frontend at `localhost:5174` and the API at `localhost:4001`. Set `CLIENT_PORT` and `API_PORT` in `.env` to choose other host ports. Local `npm run dev` still uses ports 5173 and 4000.
+
+PostgreSQL is internal to Compose. To open a database shell, run `docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' `. Containers connect to `db:5432` and `cache:6379`; the local development `DATABASE_URL` and `REDIS_URL` do not override these container connections.
+
+Open [http://localhost:5174](http://localhost:5174). Compose keeps PostgreSQL data in the `sweety_data` volume. Report results are cached for one minute and invalidated when a reading is created, edited, or deleted. At 22:00 in `REMINDER_TIMEZONE` (Asia/Kolkata by default), a worker logs accounts with fewer than four readings for that day, allowing time for the after-dinner reading. Stop the services with `docker compose down`; use `docker compose down -v` only when you also want to delete the database volume.
 
 ## Features
 

@@ -1,5 +1,6 @@
 import 'dotenv/config';
-import { Queue, Worker } from 'bullmq';
+import { Queue, Worker, createNodeRedisClient } from 'bullmq';
+import { createClient } from 'redis';
 import { initializeDatabase, pool } from './config/db.js';
 
 const QUEUE_NAME = 'daily-reading-reminders';
@@ -7,16 +8,7 @@ const timezone = process.env.REMINDER_TIMEZONE || 'Asia/Kolkata';
 
 function redisConnection() {
   if (!process.env.REDIS_URL) throw new Error('REDIS_URL is required to run the reminder worker.');
-  const url = new URL(process.env.REDIS_URL);
-  return {
-    host: url.hostname,
-    port: Number(url.port || 6379),
-    username: url.username ? decodeURIComponent(url.username) : undefined,
-    password: url.password ? decodeURIComponent(url.password) : undefined,
-    db: url.pathname.length > 1 ? Number(url.pathname.slice(1)) : 0,
-    tls: url.protocol === 'rediss:' ? {} : undefined,
-    maxRetriesPerRequest: null
-  };
+  return createNodeRedisClient(createClient({ url: process.env.REDIS_URL }));
 }
 
 function currentDateInTimezone() {
@@ -58,6 +50,7 @@ async function start() {
     shuttingDown = true;
     await worker.close();
     await queue.close();
+    await connection.quit();
     await pool.end();
     process.exit(0);
   };
