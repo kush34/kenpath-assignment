@@ -151,7 +151,9 @@ npm run test:client
 
 The tests cover API reading validation and the reading form; they do not require a running database.
 
-## Screenshots
+## Demo video and screenshots
+
+[Watch the Sweety demo on YouTube](https://youtu.be/cnsadoN3UMY).
 
 Doctor reports with five assigned demo patients:
 
