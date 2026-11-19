@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateReading } from './validation.js';
+import { validateReading } from './validators/readingValidator.js';
 import { todayISO } from '../client/src/date.js';
 
 const valid = { date: '2026-11-18', slot: 'morning', value: 108 };

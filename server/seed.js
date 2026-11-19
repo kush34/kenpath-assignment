@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
-import { initializeDatabase, pool } from './db.js';
+import { initializeDatabase, pool } from './config/db.js';
 import { todayISO } from '../client/src/date.js';
 
 const patients = [

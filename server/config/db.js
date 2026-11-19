@@ -10,7 +10,7 @@ pool.on('error', error => console.error('Unexpected PostgreSQL pool error:', err
 
 export async function initializeDatabase() {
   await pool.query('CREATE EXTENSION IF NOT EXISTS pgcrypto');
-  const schemaPath = new URL('./schema.sql', import.meta.url);
+  const schemaPath = new URL('../schema.sql', import.meta.url);
   const schema = await readFile(fileURLToPath(schemaPath), 'utf8');
   await pool.query(schema);
 }

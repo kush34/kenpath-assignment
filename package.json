@@ -11,7 +11,7 @@
     "start": "node server/index.js",
     "worker": "node server/worker.js",
     "db:seed": "node server/seed.js",
-    "test": "node server/validation.test.js && npm run test:client",
+    "test": "node --test server/*.test.js && npm run test:client",
     "test:client": "vitest run --config client/vitest.config.js"
   },
   "dependencies": {

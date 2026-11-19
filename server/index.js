@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import app from './app.js';
-import { connectCache } from './cache.js';
-import { initializeDatabase, pool } from './db.js';
+import { connectCache } from './config/cache.js';
+import { initializeDatabase, pool } from './config/db.js';
 
 const port = Number(process.env.PORT || 4000);
 if (!process.env.JWT_SECRET) {

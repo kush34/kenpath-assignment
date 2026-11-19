@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { ReadingDialog } from './App.jsx';
+import ReadingDialog from './components/ReadingDialog.jsx';
 import { todayISO } from './date.js';
 
 function renderForm(value = '') {

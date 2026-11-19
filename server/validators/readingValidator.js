@@ -1,4 +1,4 @@
-import { todayISO } from '../client/src/date.js';
+import { todayISO } from '../../client/src/date.js';
 
 const SLOT_IDS = new Set(['morning', 'breakfast', 'lunch', 'dinner']);
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;

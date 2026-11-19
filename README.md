@@ -93,6 +93,20 @@ Open [http://localhost:5173](http://localhost:5173). Compose keeps PostgreSQL da
 - Give doctors read-only access to reports for patients assigned to them.
 - Show a friendly empty state when a report has no readings.
 
+## Project structure
+
+- `client/src/pages/`: authentication, patient, and doctor screens.
+- `client/src/components/`: chart, reading dialog, reading row, and report stats.
+- `client/src/constants/`: shared reading slots and chart colors.
+- `server/routers/`: API paths and authentication/authorization middleware wiring.
+- `server/controllers/`: request validation, database operations, and HTTP responses by API area.
+- `server/services/`: report range calculations and report building shared by patient and doctor APIs.
+- `server/middlewares/`: session verification, doctor authorization, and error responses.
+- `server/config/`: PostgreSQL and optional Redis connections.
+- `server/validators/` and `server/utils/`: reading validation, token creation, and shared helpers.
+
+`server/app.js` assembles Express; `server/index.js` initializes dependencies and starts it. Existing development, seed, and worker commands are unchanged. Backend route tests stub database calls; they do not require PostgreSQL or Redis.
+
 ## API overview
 
 All reading and report endpoints require `Authorization: Bearer <token>`.

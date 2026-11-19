@@ -13,10 +13,3 @@ export function requireAuth(req, res, next) {
     res.status(401).json({ error: 'Your session has expired. Please log in again.' });
   }
 }
-
-export function createToken(userId) {
-  return jwt.sign({}, process.env.JWT_SECRET, {
-    subject: userId,
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d'
-  });
-}

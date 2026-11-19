@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Queue, Worker } from 'bullmq';
-import { initializeDatabase, pool } from './db.js';
+import { initializeDatabase, pool } from './config/db.js';
 
 const QUEUE_NAME = 'daily-reading-reminders';
 const timezone = process.env.REMINDER_TIMEZONE || 'Asia/Kolkata';
