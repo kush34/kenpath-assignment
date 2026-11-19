@@ -77,7 +77,7 @@ Copy `.env.example` to `.env`, set a private `JWT_SECRET` and a local `POSTGRES_
 docker compose up --build
 ```
 
-Open [http://localhost:5173](http://localhost:5173). Compose keeps PostgreSQL data in the `sweety_data` volume. Report results are cached for one minute and invalidated when a reading is created, edited, or deleted. A worker logs accounts below four daily readings at 09:00 in `REMINDER_TIMEZONE`. Stop the services with `docker compose down`; use `docker compose down -v` only when you also want to delete the database volume.
+Open [http://localhost:5173](http://localhost:5173). Compose keeps PostgreSQL data in the `sweety_data` volume. Report results are cached for one minute and invalidated when a reading is created, edited, or deleted. At 22:00 in `REMINDER_TIMEZONE` (Asia/Kolkata by default), a worker logs accounts with fewer than four readings for that day, allowing time for the after-dinner reading. Stop the services with `docker compose down`; use `docker compose down -v` only when you also want to delete the database volume.
 
 ## Features
 

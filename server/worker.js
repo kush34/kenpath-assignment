@@ -46,10 +46,11 @@ async function start() {
   }, { connection, concurrency: 1 });
 
   worker.on('failed', (job, error) => console.error(`Reminder job ${job?.id || ''} failed:`, error));
-  await queue.upsertJobScheduler('daily-at-nine', { pattern: '0 9 * * *', tz: timezone }, {
+  // Keep the existing scheduler ID so restarting updates it instead of adding a second schedule.
+  await queue.upsertJobScheduler('daily-at-nine', { pattern: '0 22 * * *', tz: timezone }, {
     name: 'log-incomplete-reading-accounts', data: {}, opts: { removeOnComplete: 100, removeOnFail: 100 }
   });
-  console.info(`Daily reminder worker scheduled for 09:00 ${timezone}.`);
+  console.info(`Daily reminder worker scheduled for 22:00 ${timezone}.`);
 
   let shuttingDown = false;
   const shutdown = async () => {
